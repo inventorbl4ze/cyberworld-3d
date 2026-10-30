@@ -242,8 +242,11 @@ const buildings = [];
 function makeBuilding(x, z, width, height, depth, color) {
   const building = new THREE.Mesh(
     new THREE.BoxGeometry(width, height, depth),
-    new THREE.MeshStandardMaterial({ color })
-  );
+    new THREE.MeshStandardMaterial({
+  color: 0x252a30,
+  roughness: 0.95,
+  metalness: 0.05
+})
 
   building.position.set(x, height / 2, z);
   building.castShadow = true;
