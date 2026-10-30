@@ -88,7 +88,21 @@ button:active {
   <div>Money: $500</div>
   <div id="position">Location: City</div>
 </div>
-
+<div id="money" style="
+  position:fixed;
+  top:15px;
+  right:15px;
+  background:#071a33;
+  color:#00ff99;
+  padding:12px 18px;
+  border:2px solid #00ccff;
+  border-radius:10px;
+  font-size:20px;
+  font-weight:bold;
+  z-index:100;
+">
+  💰 Money: $500
+</div>
 <div id="message">Welcome to CYBERWORLD!</div>
 
 <div id="controls">
@@ -285,7 +299,13 @@ function makeWindows(building) {
 }
 
 buildings.forEach(makeWindows);
-  
+  // MONEY SYSTEM
+let money = 500;
+
+function updateMoney() {
+  document.getElementById("money").textContent =
+    "💰 Money: $" + money;
+  }
  // CAR SYSTEM
 
 const car = new THREE.Group();
