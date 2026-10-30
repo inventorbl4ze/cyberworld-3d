@@ -615,7 +615,20 @@ if (driving) {
 
   renderer.render(scene, camera);
 }
+// JOB SYSTEM
+const jobButton = document.createElement("button");
+jobButton.textContent = "💼 Work";
+jobButton.style.cssText =
+  "position:fixed;left:20px;top:100px;z-index:100;padding:14px;background:#071a33;color:#00ffcc;border:2px solid #00ccff;border-radius:10px;font-size:18px;";
 
+document.body.appendChild(jobButton);
+
+jobButton.addEventListener("click", () => {
+  money += 100;
+  updateMoney();
+  document.getElementById("message").textContent =
+    "Job completed! You earned $100.";
+});
 animate();
       
 
