@@ -420,15 +420,7 @@ brakeButton.addEventListener("click", () => {
     document.getElementById("message").textContent = "Car stopped!";
   }
 });
-    enterCarButton.textContent = driving ? "🚶" : "🚗";
-
-    document.getElementById("message").textContent =
-      driving ? "You entered the car!" : "You left the car!";
-  } else {
-    document.getElementById("message").textContent =
-      "Move closer to the car first!";
-  }
-});
+    
   
 // Player
 const player = new THREE.Group();
