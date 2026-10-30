@@ -274,24 +274,46 @@ window.addEventListener("keyup", event => {
 });
 
 // Camera and game loop
+
+// Third-person movement and camera
 const clock = new THREE.Clock();
+
+const cameraOffset = new THREE.Vector3(0, 6, 10);
+const desiredCameraPosition = new THREE.Vector3();
 
 function animate() {
   requestAnimationFrame(animate);
 
   const delta = Math.min(clock.getDelta(), 0.05);
-  const speed = 8 * delta;
+  const moveSpeed = 9 * delta;
 
-  if (keys.forward) player.position.z -= speed;
-  if (keys.backward) player.position.z += speed;
-  if (keys.left) player.position.x -= speed;
-  if (keys.right) player.position.x += speed;
+  let moveX = 0;
+  let moveZ = 0;
+
+  if (keys.forward) moveZ -= 1;
+  if (keys.backward) moveZ += 1;
+  if (keys.left) moveX -= 1;
+  if (keys.right) moveX += 1;
+
+  const moving = moveX !== 0 || moveZ !== 0;
+
+  if (moving) {
+    const length = Math.hypot(moveX, moveZ);
+    moveX /= length;
+    moveZ /= length;
+
+    player.position.x += moveX * moveSpeed;
+    player.position.z += moveZ * moveSpeed;
+
+    player.rotation.y = Math.atan2(moveX, moveZ);
+  }
 
   player.position.x = THREE.MathUtils.clamp(player.position.x, -90, 90);
   player.position.z = THREE.MathUtils.clamp(player.position.z, -90, 90);
 
+  // Jump physics
   player.position.y += verticalSpeed;
-  verticalSpeed -= 0.009;
+  verticalSpeed -= 0.45 * delta;
 
   if (player.position.y <= 0) {
     player.position.y = 0;
@@ -299,15 +321,18 @@ function animate() {
     grounded = true;
   }
 
-  camera.position.set(
-    player.position.x,
-    player.position.y + 6,
-    player.position.z + 10
+  // Smooth third-person camera
+  desiredCameraPosition.set(
+    player.position.x + cameraOffset.x,
+    player.position.y + cameraOffset.y,
+    player.position.z + cameraOffset.z
   );
+
+  camera.position.lerp(desiredCameraPosition, 1 - Math.exp(-5 * delta));
 
   camera.lookAt(
     player.position.x,
-    player.position.y + 1,
+    player.position.y + 1.3,
     player.position.z
   );
 
@@ -320,6 +345,7 @@ function animate() {
 }
 
 animate();
+      
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
