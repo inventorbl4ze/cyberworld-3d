@@ -36,12 +36,39 @@ body {
 }
 
 #controls {
+ #controls {
   position: fixed;
-  bottom: 25px;
-  left: 20px;
-  z-index: 5;
+  bottom: 35px;
+  left: 30px;
+  z-index: 20;
+  width: 140px;
+  height: 140px;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+#joystick {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(0, 190, 255, 0.18);
+  border: 3px solid #00c8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+#joystick-knob {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: #00bfff;
+  border: 3px solid white;
+  box-shadow: 0 0 15px #00c8ff;
+  touch-action: none;
 }
 
 #actions {
@@ -106,10 +133,11 @@ button:active {
 <div id="message">Welcome to CYBERWORLD!</div>
 
 <div id="controls">
-  <button id="left">←</button>
-  <button id="forward">↑</button>
-  <button id="backward">↓</button>
-  <button id="right">→</button>
+  <div id="joystick">
+    <div id="joystick-knob"></div>
+  </div>
+</div>
+  
 </div>
 
 <div id="actions">
