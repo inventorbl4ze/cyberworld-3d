@@ -1,0 +1,333 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBERWORLD 3D</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #101827;
+  font-family: Arial, sans-serif;
+}
+
+#hud {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 5;
+  color: white;
+  background: #071526dd;
+  padding: 12px 16px;
+  border: 1px solid #00bfff;
+  border-radius: 12px;
+}
+
+#hud h2 {
+  margin: 0 0 5px;
+  color: #00c8ff;
+}
+
+#controls {
+  position: fixed;
+  bottom: 25px;
+  left: 20px;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+}
+
+#actions {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+  z-index: 5;
+}
+
+button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #00c8ff;
+  background: #071526dd;
+  color: white;
+  font-size: 23px;
+  touch-action: none;
+}
+
+button:active {
+  background: #007fa8;
+}
+
+#message {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  background: #071526dd;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 5;
+}
+</style>
+</head>
+
+<body>
+
+<div id="hud">
+  <h2>CYBERWORLD 3D</h2>
+  <div>Player: Explorer</div>
+  <div>Money: $500</div>
+  <div id="position">Location: City</div>
+</div>
+
+<div id="message">Welcome to CYBERWORLD!</div>
+
+<div id="controls">
+  <button id="left">←</button>
+  <button id="forward">↑</button>
+  <button id="backward">↓</button>
+  <button id="right">→</button>
+</div>
+
+<div id="actions">
+  <button id="jump">↑</button>
+</div>
+
+<script type="module">
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb, 35, 150);
+
+const camera = new THREE.PerspectiveCamera(
+  70,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  300
+);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x536477, 2));
+
+const sun = new THREE.DirectionalLight(0xffffff, 2);
+sun.position.set(30, 50, 20);
+sun.castShadow = true;
+scene.add(sun);
+
+// Ground
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(200, 200),
+  new THREE.MeshStandardMaterial({ color: 0x478b4b })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// Roads
+function makeRoad(x, z, width, depth) {
+  const road = new THREE.Mesh(
+    new THREE.PlaneGeometry(width, depth),
+    new THREE.MeshStandardMaterial({ color: 0x333941 })
+  );
+  road.rotation.x = -Math.PI / 2;
+  road.position.set(x, 0.02, z);
+  scene.add(road);
+}
+
+makeRoad(0, 0, 200, 12);
+makeRoad(0, 0, 12, 200);
+
+// Road markings
+for (let i = -90; i <= 90; i += 12) {
+  const mark = new THREE.Mesh(
+    new THREE.BoxGeometry(5, 0.04, 0.25),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  mark.position.set(i, 0.06, 0);
+  scene.add(mark);
+}
+
+// Buildings
+const buildings = [];
+
+function makeBuilding(x, z, width, height, depth, color) {
+  const building = new THREE.Mesh(
+    new THREE.BoxGeometry(width, height, depth),
+    new THREE.MeshStandardMaterial({ color })
+  );
+
+  building.position.set(x, height / 2, z);
+  building.castShadow = true;
+  building.receiveShadow = true;
+  scene.add(building);
+  buildings.push(building);
+}
+
+for (let x = -45; x <= 45; x += 20) {
+  for (let z = -45; z <= 45; z += 20) {
+    if (Math.abs(x) < 15 || Math.abs(z) < 15) continue;
+
+    const height = 8 + Math.random() * 18;
+
+    makeBuilding(
+      x,
+      z,
+      10,
+      height,
+      10,
+      new THREE.Color().setHSL(Math.random(), 0.35, 0.45)
+    );
+  }
+}
+
+// Player
+const player = new THREE.Group();
+
+const body = new THREE.Mesh(
+  new THREE.BoxGeometry(0.9, 1.4, 0.5),
+  new THREE.MeshStandardMaterial({ color: 0x00bfff })
+);
+body.position.y = 1.2;
+body.castShadow = true;
+player.add(body);
+
+const head = new THREE.Mesh(
+  new THREE.SphereGeometry(0.38, 20, 20),
+  new THREE.MeshStandardMaterial({ color: 0xffcc99 })
+);
+head.position.y = 2.15;
+player.add(head);
+
+scene.add(player);
+player.position.set(0, 0, 5);
+
+// Controls
+const keys = {};
+
+function bindButton(id, key) {
+  const button = document.getElementById(id);
+
+  button.addEventListener("pointerdown", event => {
+    event.preventDefault();
+    keys[key] = true;
+    button.setPointerCapture(event.pointerId);
+  });
+
+  function release(event) {
+    keys[key] = false;
+  }
+
+  button.addEventListener("pointerup", release);
+  button.addEventListener("pointercancel", release);
+  button.addEventListener("lostpointercapture", release);
+}
+
+bindButton("forward", "forward");
+bindButton("backward", "backward");
+bindButton("left", "left");
+bindButton("right", "right");
+
+let verticalSpeed = 0;
+let grounded = true;
+
+document.getElementById("jump").addEventListener("pointerdown", () => {
+  if (grounded) {
+    verticalSpeed = 0.18;
+    grounded = false;
+  }
+});
+
+// Keyboard controls
+window.addEventListener("keydown", event => {
+  if (event.key === "w" || event.key === "ArrowUp") keys.forward = true;
+  if (event.key === "s" || event.key === "ArrowDown") keys.backward = true;
+  if (event.key === "a" || event.key === "ArrowLeft") keys.left = true;
+  if (event.key === "d" || event.key === "ArrowRight") keys.right = true;
+
+  if (event.code === "Space" && grounded) {
+    verticalSpeed = 0.18;
+    grounded = false;
+  }
+});
+
+window.addEventListener("keyup", event => {
+  if (["w", "ArrowUp"].includes(event.key)) keys.forward = false;
+  if (["s", "ArrowDown"].includes(event.key)) keys.backward = false;
+  if (["a", "ArrowLeft"].includes(event.key)) keys.left = false;
+  if (["d", "ArrowRight"].includes(event.key)) keys.right = false;
+});
+
+// Camera and game loop
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const delta = Math.min(clock.getDelta(), 0.05);
+  const speed = 8 * delta;
+
+  if (keys.forward) player.position.z -= speed;
+  if (keys.backward) player.position.z += speed;
+  if (keys.left) player.position.x -= speed;
+  if (keys.right) player.position.x += speed;
+
+  player.position.x = THREE.MathUtils.clamp(player.position.x, -90, 90);
+  player.position.z = THREE.MathUtils.clamp(player.position.z, -90, 90);
+
+  player.position.y += verticalSpeed;
+  verticalSpeed -= 0.009;
+
+  if (player.position.y <= 0) {
+    player.position.y = 0;
+    verticalSpeed = 0;
+    grounded = true;
+  }
+
+  camera.position.set(
+    player.position.x,
+    player.position.y + 6,
+    player.position.z + 10
+  );
+
+  camera.lookAt(
+    player.position.x,
+    player.position.y + 1,
+    player.position.z
+  );
+
+  document.getElementById("position").textContent =
+    "Location: " +
+    Math.round(player.position.x) + ", " +
+    Math.round(player.position.z);
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+  </html>
+  
