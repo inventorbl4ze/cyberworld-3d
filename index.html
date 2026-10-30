@@ -354,11 +354,9 @@ let carSpeed = 0;
 
 // Enter and exit button
 const enterCarButton = document.createElement("button");
-
 enterCarButton.textContent = "🚗";
 enterCarButton.style.cssText =
   "position:fixed;right:20px;bottom:100px;z-index:10;width:65px;height:65px;";
-
 document.body.appendChild(enterCarButton);
 
 enterCarButton.addEventListener("click", () => {
@@ -367,6 +365,28 @@ enterCarButton.addEventListener("click", () => {
   if (distance < 5 || driving) {
     driving = !driving;
     carSpeed = 0;
+
+    if (driving) {
+      player.visible = false;
+      player.position.copy(car.position);
+    } else {
+      player.visible = true;
+      player.position.set(
+        car.position.x + 3,
+        0,
+        car.position.z
+      );
+    }
+
+    enterCarButton.textContent = driving ? "🚶" : "🚗";
+
+    document.getElementById("message").textContent =
+      driving ? "You entered the car!" : "You left the car!";
+  } else {
+    document.getElementById("message").textContent =
+      "Move closer to the car first!";
+  }
+});
 
     enterCarButton.textContent = driving ? "🚶" : "🚗";
 
