@@ -180,11 +180,27 @@ renderer.toneMappingExposure = 1.2;
 
 document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x536477, 2));
+// REALISTIC GTA-STYLE LIGHTING
 
-const sun = new THREE.DirectionalLight(0xffffff, 2);
-sun.position.set(30, 50, 20);
+scene.add(
+  new THREE.HemisphereLight(0xc5e2ff, 0x39402d, 1.8)
+);
+
+const sun = new THREE.DirectionalLight(0xfff0d6, 3);
+
+sun.position.set(40, 70, 30);
 sun.castShadow = true;
+
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+
+sun.shadow.camera.left = -100;
+sun.shadow.camera.right = 100;
+sun.shadow.camera.top = 100;
+sun.shadow.camera.bottom = -100;
+
+sun.shadow.bias = -0.0002;
+
 scene.add(sun);
 
 // Ground
