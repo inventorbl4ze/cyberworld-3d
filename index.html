@@ -387,7 +387,19 @@ enterCarButton.addEventListener("click", () => {
       "Move closer to the car first!";
   }
 });
+// BRAKE BUTTON
+const brakeButton = document.createElement("button");
+brakeButton.textContent = "🛑";
+brakeButton.style.cssText =
+  "position:fixed;right:20px;bottom:180px;z-index:10;width:65px;height:65px;";
+document.body.appendChild(brakeButton);
 
+brakeButton.addEventListener("click", () => {
+  if (driving) {
+    carSpeed = 0;
+    document.getElementById("message").textContent = "Car stopped!";
+  }
+});
     enterCarButton.textContent = driving ? "🚶" : "🚗";
 
     document.getElementById("message").textContent =
