@@ -377,9 +377,49 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   const moveSpeed = 9 * delta;
 
-  let moveX = 0;
-  let moveZ = 0;
+  
+  
+let moveX = 0;
+let moveZ = 0;
 
+if (driving) {
+  // Accelerate and reverse
+  if (keys.forward) {
+    carSpeed = Math.min(carSpeed + 15 * delta, 22);
+  } else if (keys.backward) {
+    carSpeed = Math.max(carSpeed - 15 * delta, -8);
+  } else {
+    carSpeed *= Math.pow(0.96, delta * 60);
+  }
+
+  // Steering
+  if (keys.left) {
+    car.rotation.y += 1.8 * delta;
+  }
+
+  if (keys.right) {
+    car.rotation.y -= 1.8 * delta;
+  }
+
+  // Move car
+  car.position.x -= Math.sin(car.rotation.y) * carSpeed * delta;
+  car.position.z -= Math.cos(car.rotation.y) * carSpeed * delta;
+
+  // City boundaries
+  car.position.x = THREE.MathUtils.clamp(car.position.x, -90, 90);
+  car.position.z = THREE.MathUtils.clamp(car.position.z, -90, 90);
+
+  // Rotate wheels
+  wheels.forEach(wheel => {
+    wheel.rotation.x += carSpeed * delta;
+  });
+
+  // Attach player to car
+  player.position.copy(car.position);
+  player.rotation.y = car.rotation.y;
+
+} else {
+  // Walking controls
   if (keys.forward) moveZ -= 1;
   if (keys.backward) moveZ += 1;
   if (keys.left) moveX -= 1;
@@ -397,10 +437,8 @@ function animate() {
 
     player.rotation.y = Math.atan2(moveX, moveZ);
   }
-
-  player.position.x = THREE.MathUtils.clamp(player.position.x, -90, 90);
-  player.position.z = THREE.MathUtils.clamp(player.position.z, -90, 90);
-
+  }
+                       
   // Jump physics
   player.position.y += verticalSpeed;
   verticalSpeed -= 0.45 * delta;
